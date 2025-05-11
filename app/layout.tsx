@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased dark font-[family-name:var(--font-geist-mono)] mx-3`}>
         <SidebarProvider>
           <ChatSideBar />
-          <main>
+          <main className="w-full">
             <SidebarTrigger />
             {children}
           </main>
