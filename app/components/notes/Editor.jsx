@@ -56,10 +56,10 @@ export default function NotesEditor() {
           <ToolbarPlugin />
         </div>
 
-        <div className="flex-1 relative">
+        <div className="flex-1 h-full relative min-h-0">
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="editor-input overflow-y-auto outline-none p-4" />
+              <ContentEditable className="editor-input h-full overflow-y-auto outline-none p-4" />
             }
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}

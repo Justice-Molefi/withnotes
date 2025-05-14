@@ -1,7 +1,8 @@
-'use client';
+"use client";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import Notes from "./components/notes/Notes";
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from "react";
+import simulatedChat from "./test/chats";
 
 //font-[family-name:var(--font-geist-mono)]
 //font-[family-name:var(--font-geist-sans)]
@@ -9,53 +10,67 @@ import { useRef, useState, useEffect } from 'react';
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
-    const [leftWidth, setLeftWidth] = useState(500);
-    const isDragging = useRef(false);
-  
-    useEffect(() => {
-      const handleMouseMove = (e: MouseEvent) => {
-        if (!isDragging.current || !containerRef.current) return;
-  
-        const containerLeft = containerRef.current.getBoundingClientRect().left;
-        const newWidth = e.clientX - containerLeft;
-  
-        const min = 400;
-        const max = containerRef.current.offsetWidth - 100;
-        if (newWidth > min && newWidth < max) {
-          setLeftWidth(newWidth);
-        }
-      };
-  
-      const stopDragging = () => {
-        isDragging.current = false;
-      };
-  
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', stopDragging);
-  
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', stopDragging);
-      };
-    }, []);
+  const [leftWidth, setLeftWidth] = useState(500);
+  const isDragging = useRef(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current || !containerRef.current) return;
+
+      const containerLeft = containerRef.current.getBoundingClientRect().left;
+      const newWidth = e.clientX - containerLeft;
+
+      const min = 400;
+      const max = containerRef.current.offsetWidth - 250;
+      if (newWidth > min && newWidth < max) {
+        setLeftWidth(newWidth);
+      }
+    };
+
+    const stopDragging = () => {
+      isDragging.current = false;
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", stopDragging);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", stopDragging);
+    };
+  }, []);
   return (
-    <div ref={containerRef} className="font-[family-name:var(--font-geist-mono)] w-full h-full flex border-2 border-red-500">
-       <div style={{ width: leftWidth }} className="chat text-gray-300 px-2 flex flex-col h-full">
-        <div className="user text-sm p-3 self-end bg-black rounded-sm">
-          <p>Some bullshit</p>
-        </div>
-        <div className="llm">
-          <p>Some llm bullshit more grabage</p>
-        </div>
-       </div>
-        <div
-        style={{background: '#444'}}
+    <div
+      ref={containerRef}
+      className="font-[family-name:var(--font-geist-mono)] w-full h-full flex"
+    >
+      <div
+        style={{ width: leftWidth }}
+        className="chat-container text-gray-300 flex flex-col px-5 overflow-y-auto w-full h-full"
+      >
+        {simulatedChat.map((msg, index) => (
+          <div
+            key={index}
+            className="chat text-gray-300 px-2 flex flex-col"
+          >
+            <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
+              <p>{msg.chat}</p>
+            </div>
+            <div className="llm text-xs my-3">
+              <p>{msg.chat2}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{ background: "#444" }}
         onMouseDown={() => (isDragging.current = true)}
         className="w-1 cursor-col-resize"
       />
-       <div className="notes flex-1">
+      <div className="notes flex-1">
         <Notes />
-       </div>
+      </div>
     </div>
   );
 }
