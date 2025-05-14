@@ -118,7 +118,6 @@
   }
   body {
     @apply bg-background text-foreground;
-     height: 100%;
      margin: 0;
   }
 }
@@ -133,7 +132,6 @@
 }
 
 .editor-container {
-  max-width: 600px;
   color: #ffffff;
   position: relative;
   line-height: 20px;
@@ -147,7 +145,7 @@
 }
 
 .editor-input {
-  height: calc(100vh - 72px);
+  height: 100%;
   resize: none;
   font-size: 15px;
   caret-color: rgb(255, 255, 255);
@@ -156,6 +154,7 @@
   outline: 0;
   padding: 15px 10px;
   caret-color: #444;
+  border: 1px solid red;
 }
 
 .editor-input::-webkit-scrollbar {
@@ -447,6 +446,8 @@ pre::-webkit-scrollbar-thumb {
   background: #000000;
   padding: 4px;
   vertical-align: middle;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .toolbar button.toolbar-item {

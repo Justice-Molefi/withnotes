@@ -51,8 +51,8 @@ const editorConfig = {
 export default function NotesEditor() {
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <div className="h-[100vh - 36px] flex flex-col">
-        <div className="h-[36px]">
+      <div className="h-full flex flex-col">
+        <div className="flex flex-wrap">
           <ToolbarPlugin />
         </div>
 

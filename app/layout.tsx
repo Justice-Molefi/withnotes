@@ -26,14 +26,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased dark font-[family-name:var(--font-geist-mono)] ml-3`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} border-2 border-amber-500 h-screen antialiased dark font-[family-name:var(--font-geist-mono)] ml-3`}>
         <SidebarProvider>
           <ChatSideBar />
-          <main className="w-full">
-            <div className="top-bar h-9">
+          <main className="w-full flex flex-col border-2 border-blue-300">
+            <div className="top-bar h-[36px]">
               <SidebarTrigger />
             </div>
-            {children}
+            <div className="flex-1">
+              {children}
+            </div>
           </main>
         </SidebarProvider>
       </body>
