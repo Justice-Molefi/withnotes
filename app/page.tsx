@@ -6,6 +6,7 @@ import { ChatSideBar } from "./components/chat-sidebar";
 import MainSection from "./home/mainSection";
 import Chat from "./models/Chat";
 import simulatedChat from "./mockdata/chats";
+import styles from "./page.module.css";
 
 export default function Home() {
   const [selectedChatId, setSelectedChatId] = useState<string>("");
@@ -28,17 +29,19 @@ export default function Home() {
         <div className="flex-1 min-h-0">
           <MainSection selectedChat={chat!} />
         </div>
-        <div className="py-0.5">
+        <div className={styles.inputContainer}>
           <div>
-            <input type="text" name="" id="" />
-            <div className="flex justify-between">
-              <select name="cars" id="cars">
+            <div className={styles.input}>
+              <textarea name="" id="" rows={3} placeholder="ask anything, don't be afraid"/>
+            </div>
+            <div className="flex justify-between px-1 py-2">
+              <select className={styles.models} name="models" id="models">
                 <option value="volvo">Volvo</option>
                 <option value="saab">Saab</option>
                 <option value="mercedes">Mercedes</option>
                 <option value="audi">Audi</option>
               </select>
-              <button>Send</button>
+              <button className={styles.sendButton}>Send</button>
             </div>
           </div>
         </div>
