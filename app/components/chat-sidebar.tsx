@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Sidebar,
@@ -13,12 +13,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Delete, Trash } from "lucide-react";
+import { Delete, PlusIcon, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import simulatedChat from "../mockdata/chats";
 import Chat from "../models/Chat";
 
-export function ChatSideBar({ handleMenuItemClick } : {handleMenuItemClick : (chatId : string) => void}) {
+export function ChatSideBar({
+  handleMenuItemClick,
+}: {
+  handleMenuItemClick: (chatId: string) => void;
+}) {
   const [chats, setChats] = useState<Chat[]>([]);
 
   useEffect(() => {
@@ -28,6 +32,15 @@ export function ChatSideBar({ handleMenuItemClick } : {handleMenuItemClick : (ch
     <Sidebar>
       <SidebarHeader>
         <div className="name ml-1">Withnotes</div>
+        <button
+          className="mt-2 flex items-center gap-2 px-3 py-1 text-sm text-white cursor-pointer"
+          onClick={() => {
+            console.log("New Chat clicked");
+          }}
+        >
+          <PlusIcon className="h-4 w-4" />
+          New Chat
+        </button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -36,7 +49,10 @@ export function ChatSideBar({ handleMenuItemClick } : {handleMenuItemClick : (ch
             <SidebarMenu>
               {chats.map((chat, index) => (
                 <SidebarMenuItem key={index}>
-                  <SidebarMenuButton onClick={() => handleMenuItemClick(chat.id)}>
+                  <SidebarMenuButton
+                    className="cursor-pointer"
+                    onClick={() => handleMenuItemClick(chat.id)}
+                  >
                     <a>
                       <span>{chat.summary}</span>
                     </a>

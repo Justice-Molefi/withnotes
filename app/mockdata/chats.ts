@@ -16,6 +16,42 @@ const simulatedChat : Chat[] =  [
       {
         user: "Should I repot it?",
         assistant: "Only if roots are showing through the pot holes."
+      },
+            {
+        user: "Why does my cactus look sad?",
+        assistant: "Try watering it less. Cacti like dry soil."
+      },
+      {
+        user: "How much sun should it get?",
+        assistant: "At least 4–6 hours of direct sunlight daily."
+      },
+      {
+        user: "Should I repot it?",
+        assistant: "Only if roots are showing through the pot holes."
+      },
+            {
+        user: "Why does my cactus look sad?",
+        assistant: "Try watering it less. Cacti like dry soil."
+      },
+      {
+        user: "How much sun should it get?",
+        assistant: "At least 4–6 hours of direct sunlight daily."
+      },
+      {
+        user: "Should I repot it?",
+        assistant: "Only if roots are showing through the pot holes."
+      },
+            {
+        user: "Why does my cactus look sad?",
+        assistant: "Try watering it less. Cacti like dry soil."
+      },
+      {
+        user: "How much sun should it get?",
+        assistant: "At least 4–6 hours of direct sunlight daily."
+      },
+      {
+        user: "Should I repot it?",
+        assistant: "Only if roots are showing through the pot holes."
       }
     ]
   },

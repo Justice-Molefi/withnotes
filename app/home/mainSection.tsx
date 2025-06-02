@@ -5,14 +5,12 @@ import { useRef, useState, useEffect } from "react";
 import simulatedChat from "../mockdata/chats";
 import Chat from "../models/Chat";
 
-export default function MainSection({ selectedChatId } : {selectedChatId: string}) {
+export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [leftWidth, setLeftWidth] = useState(500);
   const isDragging = useRef(false);
-  const [chat,setChat] = useState<Chat>();
 
   useEffect(() => {
-    setChat(simulatedChat.find(chat => chat.id === selectedChatId));
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current || !containerRef.current) return;
 
@@ -37,7 +35,7 @@ export default function MainSection({ selectedChatId } : {selectedChatId: string
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", stopDragging);
     };
-  }, [selectedChatId]);
+  });
 
   return (
     <div
@@ -46,13 +44,10 @@ export default function MainSection({ selectedChatId } : {selectedChatId: string
     >
       <div
         style={{ width: leftWidth }}
-        className="chat-container text-gray-300 flex flex-col px-5 overflow-y-auto w-full h-full"
+        className="chat-container text-gray-300 flex flex-col px-14 overflow-y-auto w-full h-full"
       >
-        {chat?.convos.map((conversation, index) => (
-          <div
-            key={index}
-            className="chat text-gray-300 px-2 flex flex-col"
-          >
+        {selectedChat?.convos.map((conversation, index) => (
+          <div key={index} className="chat text-gray-300 px-2 flex flex-col">
             <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
               <p>{conversation.user}</p>
             </div>
