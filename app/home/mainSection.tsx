@@ -46,13 +46,13 @@ export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
         style={{ width: leftWidth }}
         className="chat-container text-gray-300 flex flex-col px-14 overflow-y-auto w-full h-full"
       >
-        {selectedChat?.convos.map((conversation, index) => (
+        {selectedChat?.messages.map((message, index) => (
           <div key={index} className="chat text-gray-300 px-2 flex flex-col">
             <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
-              <p>{conversation.user}</p>
+              <p>{message.content}</p>
             </div>
             <div className="llm text-xs my-3">
-              <p>{conversation.assistant}</p>
+              <p>{message.role}</p>
             </div>
           </div>
         ))}

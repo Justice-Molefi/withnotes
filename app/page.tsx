@@ -7,6 +7,7 @@ import MainSection from "./home/mainSection";
 import Chat from "./models/Chat";
 import simulatedChat from "./mockdata/chats";
 import styles from "./page.module.css";
+import sendPrompt from "./home/actions";
 
 export default function Home() {
   const [selectedChatId, setSelectedChatId] = useState<string>("");
@@ -41,7 +42,7 @@ export default function Home() {
                 <option value="mercedes">Mercedes</option>
                 <option value="audi">Audi</option>
               </select>
-              <button className={styles.sendButton}>Send</button>
+              <button onClick={() => sendPrompt()} className={styles.sendButton}>Send</button>
             </div>
           </div>
         </div>

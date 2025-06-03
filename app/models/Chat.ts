@@ -1,7 +1,8 @@
-import Conversation from "./Conversation";
+import Message from "./Message";
+import Conversation from "./Message";
 
 export default interface Chat{
     id: string;
     summary: string;
-    convos: Conversation[]
+    messages: Message[]
 }
