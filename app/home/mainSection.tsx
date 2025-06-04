@@ -2,7 +2,6 @@
 
 import Notes from "../components/notes/Notes";
 import { useRef, useState, useEffect } from "react";
-import simulatedChat from "../mockdata/chats";
 import Chat from "../models/Chat";
 
 export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
