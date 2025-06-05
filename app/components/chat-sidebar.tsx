@@ -17,26 +17,28 @@ import { Delete, PlusIcon, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import simulatedChat from "../mockdata/chats";
 import Chat from "../models/Chat";
+import { getAllChats } from "../home/actions";
 
-export function ChatSideBar({
-  handleMenuItemClick,
-}: {
-  handleMenuItemClick: (chatId: string) => void;
-}) {
-  const [chats, setChats] = useState<Chat[]>([]);
+interface SideBarProps {
+  handleMenuItemClick : (chatId: string) => void,
+  handleNewChat: () => void,
+  chats : Chat[]
+}
+
+export function ChatSideBar({handleMenuItemClick,handleNewChat, chats}: SideBarProps) {
+  // const [userChats, setUserChats] = useState<Chat[]>([]);
 
   useEffect(() => {
-    setChats(simulatedChat);
-  }, []);
+  }, [chats]);
+
+
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="name ml-1">Withnotes</div>
         <button
           className="mt-2 flex items-center gap-2 px-3 py-1 text-sm text-white cursor-pointer"
-          onClick={() => {
-            console.log("New Chat clicked");
-          }}
+          onClick={() => handleNewChat()}
         >
           <PlusIcon className="h-4 w-4" />
           New Chat
@@ -54,7 +56,7 @@ export function ChatSideBar({
                     onClick={() => handleMenuItemClick(chat.id)}
                   >
                     <a>
-                      <span>{chat.summary}</span>
+                      <span>{chat.summary ? chat.summary : 'new chat'}</span>
                     </a>
                   </SidebarMenuButton>
                   <SidebarMenuAction>

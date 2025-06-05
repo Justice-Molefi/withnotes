@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import Message from "../models/Message";
 import Chat from "../models/Chat";
 import { Role } from "../models/Role";
+import { Tienne } from "next/font/google";
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -11,57 +12,48 @@ const openai = new OpenAI({
 });
 
 
-export default async function sendPrompt(userPrompt: string) {
-  let Chat: Chat;
-  let isNewChat = false;
-  const generateSummary =
-    "Generate one line summary that summarizes what the user just prompted, on the first line write only the title (no quotes, no markdown) then address the user prompt on subsequent lines";
-  const summaryMessage: Message = {
-    role: Role.User,
-    content: generateSummary,
-  };
-  const userMessage: Message = { role: Role.User, content: userPrompt };
+export default async function sendPrompt(userPrompt: string,  id: string, localStorageChats: string) {
 
-  const storedContext = localStorage.getItem("context");
-  if (storedContext) {
-    Chat = JSON.parse(storedContext);
-    Chat.messages.push(userMessage);
-  } else {
-    isNewChat = true;
-    Chat = {
-      id: "pampers",
-      summary: "",
-      messages: [summaryMessage, userMessage],
-    };
-  }
+  // const localStorageChats = localStorage.getItem("Chats");
+  var chats : Chat[] = JSON.parse(localStorageChats!);
 
-  const response = await openai.chat.completions.create({
-    messages: Chat.messages as any,
-    model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
-  });
 
-  const { role, content } = response.choices[0].message;
+  var chat : Chat | undefined = chats.find(chat => chat.id === id);  
+  if(!chat) return "Something went wrong, please touch some grass and come back later";
 
-  if (!content)
-    return "Something went wrong, please touch some grass and come back later";
+  //is this new chat??
+  var isNewChat = chat.summary ? false : true;
 
-  //append prompt response to context
-  if (isNewChat) {
-    const { title, originalPromptResponse } = parseTitleAndPrompt(content);
-    Chat.summary = title;
-    Chat.messages.push({
-      role: Role.Assistant,
-      content: originalPromptResponse,
-    });
+  if(isNewChat){
+    const generateSummary = "Generate one line summary that summarizes what the user just prompted, on the first line write only the title (no quotes, no markdown) then address the user prompt on subsequent lines";
+    const modifiedPrompt = userPrompt + generateSummary;
 
-    localStorage.setItem("context", JSON.stringify(Chat));
+    const promptMessages : Message[] = chat.messages;
+    promptMessages.push({role: Role.User, content : modifiedPrompt})
+    const response = await send(promptMessages);
+
+    if(!response) return "Something went wrong, please touch some grass and come back later";
+
+    var {title, originalPromptResponse } = parseTitleAndPrompt(response.choices[0].message.content!);
+
+    chat.summary = title;
+    chat.messages.push({role: Role.User, content: userPrompt});
+    chat.messages.push({role: Role.Assistant, content: originalPromptResponse})
+
+    storeChats(chats);
     return originalPromptResponse;
   }
 
-  Chat.messages.push({ role: Role.Assistant, content: content });
-  console.log("Que Pasa puta: " + content);
-  localStorage.setItem("context", JSON.stringify(Chat));
-  return content;
+
+  chat.messages.push({role : Role.User, content: userPrompt});
+  const response = await send(chat.messages);
+
+  if(!response) return "Something went wrong, please touch some grass and come back later";
+
+  chat.messages.push({role: Role.Assistant, content: response.choices[0].message.content!})
+  storeChats(chats);
+  return response.choices[0].message.content;
+
 }
 
 function parseTitleAndPrompt(response: string) {
@@ -73,13 +65,27 @@ function parseTitleAndPrompt(response: string) {
   return { title, originalPromptResponse };
 }
 
-export function getAllChats(id : string) : Message[] {
+export async function getAllChats(localStorageChats: string) : Promise<Chat[]> {
 
-  const context = localStorage.getItem("context");
-  if(!context) return [];
+  // const storedChats = localStorage.getItem("context");
+  if(!localStorageChats) return [];
 
-  const chatObj : Chat = JSON.parse(context);
-
-  return chatObj.messages;
+  const chats : Chat[] = JSON.parse(localStorageChats!);
+  return chats;
 }
 
+
+//make request to model api
+async function send(messages : any){
+  const response = await openai.chat.completions.create({
+    messages: messages,
+    model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+  });
+
+  return response;
+}
+
+//store chat 
+function storeChats(chats: Chat[]){
+  localStorage.setItem("Chats", JSON.stringify(chats));
+}
