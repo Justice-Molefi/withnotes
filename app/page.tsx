@@ -16,22 +16,27 @@ export default function Home() {
   const [localStorageChats, setLocalStorageChats] = useState<string>("");
 
   useEffect(() => {
+    const chats = localStorage.getItem("Chats");
+    if (chats) setLocalStorageChats(chats);
+  }, [selectedChatId]);
+
+  useEffect(() => {
     let isCancelled = false;
-    setLocalStorageChats(localStorage.getItem("Chats")!);
+
     const fetchData = async () => {
       let data = await getAllChats(localStorageChats!);
       if (!isCancelled) {
         setAllChats(data);
+        console.log("ONE: " + selectedChatId);
         setChat(data.find((chat) => chat.id === selectedChatId));
       }
     };
-
     fetchData();
 
     return () => {
       isCancelled = true;
     };
-  }, [selectedChatId, allChats]);
+  }, [selectedChatId, localStorageChats]);
 
   const handleNewChat = () => {
     const newChat: Chat = {
@@ -39,15 +44,31 @@ export default function Home() {
       summary: "",
       messages: [],
     };
-    let chats: Chat[] = allChats;
 
-    // if (!localStorageChats) {
-    //   return;
-    // }
+    setAllChats((prev) => {
+      const updated = [...prev, newChat];
+      localStorage.setItem("Chats", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-    chats.push(newChat);
-    localStorage.setItem("Chats", JSON.stringify(chats));
-    setAllChats(chats);
+  const handleSendPrompt = async () => {
+    const response = await sendPrompt(
+      prompt,
+      selectedChatId,
+      localStorageChats
+    );
+    if (!response) {
+      console.error("Something went wrong!!");
+      return;
+    }
+
+    setAllChats((prev) => {
+      const updated = [...prev, response];
+      localStorage.setItem("Chats", JSON.stringify(updated));
+      return updated;
+    });
+    setChat(response);
   };
 
   return (
@@ -87,9 +108,7 @@ export default function Home() {
               </select>
               <button
                 disabled={prompt && selectedChatId ? false : true}
-                onClick={() =>
-                  sendPrompt(prompt, selectedChatId, localStorageChats)
-                }
+                onClick={handleSendPrompt}
                 className={styles.sendButton}
               >
                 Send

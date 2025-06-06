@@ -14,12 +14,10 @@ const openai = new OpenAI({
 
 export default async function sendPrompt(userPrompt: string,  id: string, localStorageChats: string) {
 
-  // const localStorageChats = localStorage.getItem("Chats");
   var chats : Chat[] = JSON.parse(localStorageChats!);
 
-
   var chat : Chat | undefined = chats.find(chat => chat.id === id);  
-  if(!chat) return "Something went wrong, please touch some grass and come back later";
+  if(!chat) return null;
 
   //is this new chat??
   var isNewChat = chat.summary ? false : true;
@@ -28,11 +26,11 @@ export default async function sendPrompt(userPrompt: string,  id: string, localS
     const generateSummary = "Generate one line summary that summarizes what the user just prompted, on the first line write only the title (no quotes, no markdown) then address the user prompt on subsequent lines";
     const modifiedPrompt = userPrompt + generateSummary;
 
-    const promptMessages : Message[] = chat.messages;
+    const promptMessages : Message[] = [...chat.messages];
     promptMessages.push({role: Role.User, content : modifiedPrompt})
     const response = await send(promptMessages);
 
-    if(!response) return "Something went wrong, please touch some grass and come back later";
+    if(!response) return null;
 
     var {title, originalPromptResponse } = parseTitleAndPrompt(response.choices[0].message.content!);
 
@@ -40,19 +38,19 @@ export default async function sendPrompt(userPrompt: string,  id: string, localS
     chat.messages.push({role: Role.User, content: userPrompt});
     chat.messages.push({role: Role.Assistant, content: originalPromptResponse})
 
-    storeChats(chats);
-    return originalPromptResponse;
+    //storeChats(chats);
+    return chat;
   }
 
 
   chat.messages.push({role : Role.User, content: userPrompt});
   const response = await send(chat.messages);
 
-  if(!response) return "Something went wrong, please touch some grass and come back later";
+  if(!response) return null;
 
   chat.messages.push({role: Role.Assistant, content: response.choices[0].message.content!})
-  storeChats(chats);
-  return response.choices[0].message.content;
+  //storeChats(chats);
+  return chat;
 
 }
 
@@ -67,10 +65,9 @@ function parseTitleAndPrompt(response: string) {
 
 export async function getAllChats(localStorageChats: string) : Promise<Chat[]> {
 
-  // const storedChats = localStorage.getItem("context");
   if(!localStorageChats) return [];
 
-  const chats : Chat[] = JSON.parse(localStorageChats!);
+  const chats : Chat[] = JSON.parse(localStorageChats);
   return chats;
 }
 
@@ -86,6 +83,6 @@ async function send(messages : any){
 }
 
 //store chat 
-function storeChats(chats: Chat[]){
-  localStorage.setItem("Chats", JSON.stringify(chats));
-}
+// function storeChats(chats: Chat[]){
+//   localStorage.setItem("Chats", JSON.stringify(chats));
+// }

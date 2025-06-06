@@ -47,12 +47,15 @@ export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
       >
         {selectedChat?.messages.map((message, index) => (
           <div key={index} className="chat text-gray-300 px-2 flex flex-col">
-            <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
-              <p>{message.content}</p>
-            </div>
-            <div className="llm text-xs my-3">
-              <p>{message.role}</p>
-            </div>
+            {message.role === "user" ? (
+              <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
+                <p>{message.content}</p>
+              </div>
+            ) : (
+              <div className="llm text-xs my-3">
+                <p>{message.content}</p>
+              </div>
+            )}
           </div>
         ))}
       </div>

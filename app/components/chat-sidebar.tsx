@@ -28,8 +28,8 @@ interface SideBarProps {
 export function ChatSideBar({handleMenuItemClick,handleNewChat, chats}: SideBarProps) {
   // const [userChats, setUserChats] = useState<Chat[]>([]);
 
-  useEffect(() => {
-  }, [chats]);
+  // useEffect(() => {
+  // }, [chats]);
 
 
   return (
