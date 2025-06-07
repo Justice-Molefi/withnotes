@@ -14,10 +14,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Delete, PlusIcon, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
-import simulatedChat from "../mockdata/chats";
 import Chat from "../models/Chat";
-import { getAllChats } from "../home/actions";
 
 interface SideBarProps {
   handleMenuItemClick : (chatId: string) => void,
@@ -26,12 +23,6 @@ interface SideBarProps {
 }
 
 export function ChatSideBar({handleMenuItemClick,handleNewChat, chats}: SideBarProps) {
-  // const [userChats, setUserChats] = useState<Chat[]>([]);
-
-  // useEffect(() => {
-  // }, [chats]);
-
-
   return (
     <Sidebar>
       <SidebarHeader>

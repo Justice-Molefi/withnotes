@@ -6,7 +6,8 @@ import { ChatSideBar } from "./components/chat-sidebar";
 import MainSection from "./home/mainSection";
 import Chat from "./models/Chat";
 import styles from "./page.module.css";
-import sendPrompt, { getAllChats } from "./home/actions";
+import { Role } from "./models/Role";
+import sendPrompt from "./home/actions";
 
 export default function Home() {
   const [selectedChatId, setSelectedChatId] = useState<string>("");
@@ -15,67 +16,127 @@ export default function Home() {
   const [prompt, setPrompt] = useState<string>("");
   const [localStorageChats, setLocalStorageChats] = useState<string>("");
 
+  //load all chats
   useEffect(() => {
-    const chats = localStorage.getItem("Chats");
-    if (chats) setLocalStorageChats(chats);
+    setAllChats(loadChats());
+  },[]);
+
+  // useEffect(() => {
+  //   localStorage.setItem("Chats", JSON.stringify(allChats));
+  // }, [allChats]);
+
+  //when click item, have to update current chat
+  useEffect(() => {
+    setChat(allChats.find((chat) => chat.id === selectedChatId));
+    console.log(selectedChatId);
   }, [selectedChatId]);
 
-  useEffect(() => {
-    let isCancelled = false;
+  // useEffect(() => {
+  //   const chats = localStorage.getItem("Chats");
+  //   if (chats) setLocalStorageChats(chats);
+  // }, [selectedChatId]);
 
-    const fetchData = async () => {
-      let data = await getAllChats(localStorageChats!);
-      if (!isCancelled) {
-        setAllChats(data);
-        console.log("ONE: " + selectedChatId);
-        setChat(data.find((chat) => chat.id === selectedChatId));
+  // useEffect(() => {
+  //   let isCancelled = false;
+
+  //   const fetchData = async () => {
+  //     let data = await getAllChats(localStorageChats!);
+  //     if (!isCancelled) {
+  //       setAllChats(data);
+  //       console.log("ONE: " + selectedChatId);
+  //       setChat(data.find((chat) => chat.id === selectedChatId));
+  //     }
+  //   };
+  //   fetchData();
+
+  //   return () => {
+  //     isCancelled = true;
+  //   };
+  // }, [selectedChatId, localStorageChats]);
+
+  //when i send prompt
+  //- add user prompt to messages of currentChat and update state
+  //- when response arrives - append response to Current chat messages and update state
+  // - save
+
+  const handleSendPrompt = async () => {
+    if (chat) {
+      const updatedChat = {
+        ...chat,
+        messages: [...chat.messages, { role: Role.User, content: prompt }],
+      };
+      setChat(updatedChat);
+      const response = await sendPrompt(prompt, updatedChat);
+      if (response) {
+        setChat(response);
+        setAllChats((prev) => {
+          const updatedChats = prev.map(chat => chat.id === response.id ? response : chat);
+          save(updatedChats);
+          return updatedChats;
+        });
       }
-    };
-    fetchData();
+    }
+  };
 
-    return () => {
-      isCancelled = true;
-    };
-  }, [selectedChatId, localStorageChats]);
-
-  const handleNewChat = () => {
+  const handleCreateNewChat = () => {
+    //create new chat with defaults
     const newChat: Chat = {
       id: crypto.randomUUID(),
       summary: "",
       messages: [],
     };
 
+    //append to allChats (setAllChats), save, update current chat to new chat
     setAllChats((prev) => {
-      const updated = [...prev, newChat];
-      localStorage.setItem("Chats", JSON.stringify(updated));
-      return updated;
+      const updatedChats = [...prev, newChat];
+      save(updatedChats);
+      return updatedChats;
     });
+    //setChat(newChat);
+    setSelectedChatId(newChat.id)
   };
 
-  const handleSendPrompt = async () => {
-    const response = await sendPrompt(
-      prompt,
-      selectedChatId,
-      localStorageChats
-    );
-    if (!response) {
-      console.error("Something went wrong!!");
-      return;
-    }
+  // const handleSendPrompt = async () => {
+  //   const response = await sendPrompt(
+  //     prompt,
+  //     selectedChatId,
+  //     localStorageChats
+  //   );
+  //   if (!response) {
+  //     console.error("Something went wrong!!");
+  //     return;
+  //   }
 
-    setAllChats((prev) => {
-      const updated = [...prev, response];
-      localStorage.setItem("Chats", JSON.stringify(updated));
-      return updated;
-    });
-    setChat(response);
+  //   setAllChats((prev) =>
+  //     prev.map((chat) => (chat.id === response.id ? response : chat))
+  //   );
+  //   setChat(response);
+  // };
+  //load all chats from local storage once when component mounts
+  //from there just update only local vars and trigger re-renders
+  //when new chat created - append chat to local var and save to localstorage
+  //when menu item clicked update chat, and pass it to relevant comp
+  //when sending prompt add user prompt to local var and when response arrives add that too then save to localstorage
+  //
+
+  //helper functions
+  const loadChats = (): Chat[] => {
+    const storedChats = localStorage.getItem("Chats");
+    if (!storedChats) return [];
+
+    const parsedChats: Chat[] = JSON.parse(storedChats);
+    return parsedChats;
+  };
+
+  const save = (chats: Chat[]) => {
+    localStorage.setItem("Chats", JSON.stringify(chats));
   };
 
   return (
     <SidebarProvider>
       <ChatSideBar
         handleMenuItemClick={setSelectedChatId}
-        handleNewChat={handleNewChat}
+        handleNewChat={handleCreateNewChat}
         chats={allChats}
       />
       <main className="w-full h-screen flex flex-col">

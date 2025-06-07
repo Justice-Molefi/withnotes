@@ -4,76 +4,62 @@ import OpenAI from "openai";
 import Message from "../models/Message";
 import Chat from "../models/Chat";
 import { Role } from "../models/Role";
-import { Tienne } from "next/font/google";
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: process.env.DS_API_KEY,
 });
 
-
-export default async function sendPrompt(userPrompt: string,  id: string, localStorageChats: string) {
-
-  var chats : Chat[] = JSON.parse(localStorageChats!);
-
-  var chat : Chat | undefined = chats.find(chat => chat.id === id);  
-  if(!chat) return null;
-
+export default async function sendPrompt(
+  userPrompt: string,
+  chat: Chat
+): Promise<Chat | null> {
+  if (!chat) return null;
+  
   //is this new chat??
   var isNewChat = chat.summary ? false : true;
 
-  if(isNewChat){
-    const generateSummary = "Generate one line summary that summarizes what the user just prompted, on the first line write only the title (no quotes, no markdown) then address the user prompt on subsequent lines";
-    const modifiedPrompt = userPrompt + generateSummary;
-
-    const promptMessages : Message[] = [...chat.messages];
-    promptMessages.push({role: Role.User, content : modifiedPrompt})
-    const response = await send(promptMessages);
-
-    if(!response) return null;
-
-    var {title, originalPromptResponse } = parseTitleAndPrompt(response.choices[0].message.content!);
-
-    chat.summary = title;
-    chat.messages.push({role: Role.User, content: userPrompt});
-    chat.messages.push({role: Role.Assistant, content: originalPromptResponse})
-
-    //storeChats(chats);
-    return chat;
+  if (isNewChat) {
+    const generateSummary = "generate a one line summary (just respond with only the summary nothing else!) for this prompt: " + userPrompt;
+    const summaryResponse = await send([
+      {
+        role: Role.User,
+        content: generateSummary,
+      },
+    ]);
+    if (!summaryResponse) return null;
+    chat.summary = summaryResponse.choices[0].message.content!;
   }
 
+  const userPromptResponse = await send(chat.messages);
 
-  chat.messages.push({role : Role.User, content: userPrompt});
-  const response = await send(chat.messages);
+  if (!userPromptResponse) return null;
+  chat.messages.push({
+    role: Role.Assistant,
+    content: userPromptResponse.choices[0].message.content!,
+  });
 
-  if(!response) return null;
-
-  chat.messages.push({role: Role.Assistant, content: response.choices[0].message.content!})
-  //storeChats(chats);
   return chat;
-
 }
 
-function parseTitleAndPrompt(response: string) {
-  const lines = response.trim().split("\n");
+// function parseTitleAndPrompt(response: string) {
+//   const lines = response.trim().split("\n");
 
-  const title = lines[0]?.trim() || "";
-  const originalPromptResponse = lines.slice(1).join("\n").trim();
+//   const title = lines[0]?.trim() || "";
+//   const originalPromptResponse = lines.slice(1).join("\n").trim();
 
-  return { title, originalPromptResponse };
-}
+//   return { title, originalPromptResponse };
+// }
 
-export async function getAllChats(localStorageChats: string) : Promise<Chat[]> {
+// export async function getAllChats(localStorageChats: string): Promise<Chat[]> {
+//   if (!localStorageChats) return [];
 
-  if(!localStorageChats) return [];
-
-  const chats : Chat[] = JSON.parse(localStorageChats);
-  return chats;
-}
-
+//   const chats: Chat[] = JSON.parse(localStorageChats);
+//   return chats;
+// }
 
 //make request to model api
-async function send(messages : any){
+async function send(messages: any) {
   const response = await openai.chat.completions.create({
     messages: messages,
     model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
@@ -82,7 +68,7 @@ async function send(messages : any){
   return response;
 }
 
-//store chat 
+//store chat
 // function storeChats(chats: Chat[]){
 //   localStorage.setItem("Chats", JSON.stringify(chats));
 // }
