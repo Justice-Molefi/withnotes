@@ -14,68 +14,55 @@ export default function Home() {
   const [chat, setChat] = useState<Chat>();
   const [allChats, setAllChats] = useState<Chat[]>([]);
   const [prompt, setPrompt] = useState<string>("");
-  const [localStorageChats, setLocalStorageChats] = useState<string>("");
+  const [disableSend, setDisableSend] = useState<boolean>(false);
 
   //load all chats
   useEffect(() => {
-    setAllChats(loadChats());
-  },[]);
+    const allChats = loadChats();
+    setAllChats(allChats);
 
-  // useEffect(() => {
-  //   localStorage.setItem("Chats", JSON.stringify(allChats));
-  // }, [allChats]);
+    if (allChats) {
+      const lastChat = allChats[0];
+      setSelectedChatId(lastChat.id);
+    }
+  }, []);
 
   //when click item, have to update current chat
   useEffect(() => {
     setChat(allChats.find((chat) => chat.id === selectedChatId));
-    console.log(selectedChatId);
   }, [selectedChatId]);
-
-  // useEffect(() => {
-  //   const chats = localStorage.getItem("Chats");
-  //   if (chats) setLocalStorageChats(chats);
-  // }, [selectedChatId]);
-
-  // useEffect(() => {
-  //   let isCancelled = false;
-
-  //   const fetchData = async () => {
-  //     let data = await getAllChats(localStorageChats!);
-  //     if (!isCancelled) {
-  //       setAllChats(data);
-  //       console.log("ONE: " + selectedChatId);
-  //       setChat(data.find((chat) => chat.id === selectedChatId));
-  //     }
-  //   };
-  //   fetchData();
-
-  //   return () => {
-  //     isCancelled = true;
-  //   };
-  // }, [selectedChatId, localStorageChats]);
-
-  //when i send prompt
-  //- add user prompt to messages of currentChat and update state
-  //- when response arrives - append response to Current chat messages and update state
-  // - save
 
   const handleSendPrompt = async () => {
     if (chat) {
       const updatedChat = {
         ...chat,
-        messages: [...chat.messages, { role: Role.User, content: prompt }],
+        messages: [
+          ...chat.messages,
+          { role: Role.User, content: prompt },
+          { role: Role.Assistant, content: "Generating Response..." },
+        ],
       };
+      const userPrompt = prompt;
+
+      //clear form input
+      setPrompt("");
+      setDisableSend(true);
       setChat(updatedChat);
-      const response = await sendPrompt(prompt, updatedChat);
+
+      const response = await sendPrompt(userPrompt, updatedChat);
       if (response) {
         setChat(response);
         setAllChats((prev) => {
-          const updatedChats = prev.map(chat => chat.id === response.id ? response : chat);
+          const updatedChats = prev.map((chat) =>
+            chat.id === response.id ? response : chat
+          );
           save(updatedChats);
           return updatedChats;
         });
       }
     }
+
+    setDisableSend(false);
   };
 
   const handleCreateNewChat = () => {
@@ -93,31 +80,14 @@ export default function Home() {
       return updatedChats;
     });
     //setChat(newChat);
-    setSelectedChatId(newChat.id)
+    setSelectedChatId(newChat.id);
   };
 
-  // const handleSendPrompt = async () => {
-  //   const response = await sendPrompt(
-  //     prompt,
-  //     selectedChatId,
-  //     localStorageChats
-  //   );
-  //   if (!response) {
-  //     console.error("Something went wrong!!");
-  //     return;
-  //   }
-
-  //   setAllChats((prev) =>
-  //     prev.map((chat) => (chat.id === response.id ? response : chat))
-  //   );
-  //   setChat(response);
-  // };
-  //load all chats from local storage once when component mounts
-  //from there just update only local vars and trigger re-renders
-  //when new chat created - append chat to local var and save to localstorage
-  //when menu item clicked update chat, and pass it to relevant comp
-  //when sending prompt add user prompt to local var and when response arrives add that too then save to localstorage
-  //
+  const handleDeleteChat = (id: string) => {
+    const updatedChats = allChats.filter((chat) => chat.id !== id);
+    save(updatedChats);
+    setAllChats(updatedChats);
+  };
 
   //helper functions
   const loadChats = (): Chat[] => {
@@ -125,7 +95,7 @@ export default function Home() {
     if (!storedChats) return [];
 
     const parsedChats: Chat[] = JSON.parse(storedChats);
-    return parsedChats;
+    return parsedChats.reverse();
   };
 
   const save = (chats: Chat[]) => {
@@ -138,11 +108,12 @@ export default function Home() {
         handleMenuItemClick={setSelectedChatId}
         handleNewChat={handleCreateNewChat}
         chats={allChats}
+        handleDeleteChat={handleDeleteChat}
       />
       <main className="w-full h-screen flex flex-col">
         <div className="top-bar flex justify-between">
           <SidebarTrigger />
-          <div className="w-full py-3 px-52">
+          <div className="w-full py-3 px-52 text-sm">
             <div className="flex justify-start">{chat?.summary}</div>
           </div>
         </div>
@@ -156,19 +127,19 @@ export default function Home() {
                 onChange={(e) => setPrompt(e.target.value)}
                 name=""
                 id=""
+                value={prompt}
                 rows={3}
                 placeholder="ask anything, don't be afraid"
               />
             </div>
             <div className="flex justify-between px-1 py-2">
               <select className={styles.models} name="models" id="models">
-                <option value="volvo">Volvo</option>
-                <option value="saab">Saab</option>
-                <option value="mercedes">Mercedes</option>
-                <option value="audi">Audi</option>
+                <option value="model">deepseek-r1-0528-qwen3-8b</option>
               </select>
               <button
-                disabled={prompt && selectedChatId ? false : true}
+                disabled={
+                  prompt && selectedChatId && !disableSend ? false : true
+                }
                 onClick={handleSendPrompt}
                 className={styles.sendButton}
               >

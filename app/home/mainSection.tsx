@@ -3,6 +3,7 @@
 import Notes from "../components/notes/Notes";
 import { useRef, useState, useEffect } from "react";
 import Chat from "../models/Chat";
+import ReactMarkdown from "react-markdown";
 
 export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,24 +42,33 @@ export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
       ref={containerRef}
       className="font-[family-name:var(--font-geist-mono)] w-full h-full flex"
     >
-      <div
-        style={{ width: leftWidth }}
-        className="chat-container text-gray-300 flex flex-col px-14 overflow-y-auto w-full h-full"
-      >
-        {selectedChat?.messages.map((message, index) => (
-          <div key={index} className="chat text-gray-300 px-2 flex flex-col">
-            {message.role === "user" ? (
-              <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
-                <p>{message.content}</p>
-              </div>
-            ) : (
-              <div className="llm text-xs my-3">
-                <p>{message.content}</p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {selectedChat.messages.length > 0 ? (
+        <div
+          style={{ width: leftWidth }}
+          className="chat-container text-gray-300 flex flex-col px-14 overflow-y-auto w-full h-full"
+        >
+          {selectedChat?.messages.map((message, index) => (
+            <div key={index} className="chat text-gray-300 px-2 flex flex-col">
+              {message.role === "user" ? (
+                <div className="user text-xs p-3 my-3 self-end bg-black rounded-sm">
+                  <p>{message.content}</p>
+                </div>
+              ) : (
+                <div className="llm text-xs my-3">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div
+          style={{ width: leftWidth }}
+          className="chat-container text-gray-300 flex flex-col px-14 overflow-y-auto w-full h-full"
+        >
+          <p>Hey 😁, What can I help with?</p>
+        </div>
+      )}
 
       <div
         style={{ background: "#444" }}

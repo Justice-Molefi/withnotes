@@ -19,10 +19,11 @@ import Chat from "../models/Chat";
 interface SideBarProps {
   handleMenuItemClick : (chatId: string) => void,
   handleNewChat: () => void,
+  handleDeleteChat: (id : string) => void,
   chats : Chat[]
 }
 
-export function ChatSideBar({handleMenuItemClick,handleNewChat, chats}: SideBarProps) {
+export function ChatSideBar({handleMenuItemClick,handleNewChat,handleDeleteChat, chats}: SideBarProps) {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -43,14 +44,14 @@ export function ChatSideBar({handleMenuItemClick,handleNewChat, chats}: SideBarP
               {chats.map((chat, index) => (
                 <SidebarMenuItem key={index}>
                   <SidebarMenuButton
-                    className="cursor-pointer"
+                    className="cursor-pointer flex-1 overflow-hidden"
                     onClick={() => handleMenuItemClick(chat.id)}
                   >
-                    <a>
-                      <span>{chat.summary ? chat.summary : 'new chat'}</span>
+                    <a className="block overflow-hidden">
+                      <span className="truncate block max-w-full text-xs">{chat.summary ? chat.summary : 'new chat'}</span>
                     </a>
                   </SidebarMenuButton>
-                  <SidebarMenuAction>
+                  <SidebarMenuAction onClick={() => handleDeleteChat(chat.id)}>
                     <Trash /> <span className="sr-only">delete project</span>
                   </SidebarMenuAction>
                 </SidebarMenuItem>

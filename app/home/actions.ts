@@ -15,12 +15,17 @@ export default async function sendPrompt(
   chat: Chat
 ): Promise<Chat | null> {
   if (!chat) return null;
-  
+
   //is this new chat??
-  var isNewChat = chat.summary ? false : true;
+  var isNewChat = !chat.summary;
+  let summary = "";
 
   if (isNewChat) {
-    const generateSummary = "generate a one line summary (just respond with only the summary nothing else!) for this prompt: " + userPrompt;
+    const generateSummary = `Summarize the following prompt in one short line. ONLY return the summary, do NOT answer it.
+
+Prompt:
+${userPrompt}`;
+
     const summaryResponse = await send([
       {
         role: Role.User,
@@ -28,35 +33,30 @@ export default async function sendPrompt(
       },
     ]);
     if (!summaryResponse) return null;
-    chat.summary = summaryResponse.choices[0].message.content!;
+    summary = summaryResponse.choices[0].message.content!;
   }
 
-  const userPromptResponse = await send(chat.messages);
+  const assistantResponse = await send(chat.messages);
 
-  if (!userPromptResponse) return null;
-  chat.messages.push({
+  if (!assistantResponse) return null;
+
+  const updatedMessages = [...chat.messages];
+
+  //pop removes the loading message, before adding assistant response
+  updatedMessages.pop();
+  updatedMessages.push({
     role: Role.Assistant,
-    content: userPromptResponse.choices[0].message.content!,
+    content: assistantResponse.choices[0].message.content!,
   });
 
-  return chat;
+  const updatedChat = {
+    ...chat,
+    summary: isNewChat ? summary : chat.summary,
+    messages: updatedMessages,
+  };
+
+  return updatedChat;
 }
-
-// function parseTitleAndPrompt(response: string) {
-//   const lines = response.trim().split("\n");
-
-//   const title = lines[0]?.trim() || "";
-//   const originalPromptResponse = lines.slice(1).join("\n").trim();
-
-//   return { title, originalPromptResponse };
-// }
-
-// export async function getAllChats(localStorageChats: string): Promise<Chat[]> {
-//   if (!localStorageChats) return [];
-
-//   const chats: Chat[] = JSON.parse(localStorageChats);
-//   return chats;
-// }
 
 //make request to model api
 async function send(messages: any) {
@@ -67,8 +67,3 @@ async function send(messages: any) {
 
   return response;
 }
-
-//store chat
-// function storeChats(chats: Chat[]){
-//   localStorage.setItem("Chats", JSON.stringify(chats));
-// }
