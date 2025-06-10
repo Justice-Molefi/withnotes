@@ -8,6 +8,7 @@ import Chat from "./models/Chat";
 import styles from "./page.module.css";
 import { Role } from "./models/Role";
 import sendPrompt from "./home/actions";
+import { Coins } from "lucide-react";
 
 export default function Home() {
   const [selectedChatId, setSelectedChatId] = useState<string>("");
@@ -15,15 +16,18 @@ export default function Home() {
   const [allChats, setAllChats] = useState<Chat[]>([]);
   const [prompt, setPrompt] = useState<string>("");
   const [disableSend, setDisableSend] = useState<boolean>(false);
+  const [note, setNote] = useState("");
+  const [debouncedNote, setDebouncedNote] = useState(note);
 
   //load all chats
   useEffect(() => {
     const allChats = loadChats();
     setAllChats(allChats);
-
-    if (allChats) {
+    if (allChats.length > 0) {
       const lastChat = allChats[0];
       setSelectedChatId(lastChat.id);
+    } else {
+      handleCreateNewChat();
     }
   }, []);
 
@@ -31,6 +35,28 @@ export default function Home() {
   useEffect(() => {
     setChat(allChats.find((chat) => chat.id === selectedChatId));
   }, [selectedChatId]);
+
+  //save note
+  useEffect(() => {
+    console.log("Saving Note : " + note);
+    const timeout = setTimeout(() => {
+      if (chat) {
+        const updatedChat = {
+          ...chat,
+          note: note,
+        };
+
+        setAllChats((prev) => {
+          const updatedChats = prev.map((chat) =>
+            chat.id === updatedChat.id ? updatedChat : chat
+          );
+          save(updatedChats);
+          return updatedChats;
+        });
+      }
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [note]);
 
   const handleSendPrompt = async () => {
     if (chat) {
@@ -71,6 +97,7 @@ export default function Home() {
       id: crypto.randomUUID(),
       summary: "",
       messages: [],
+      notes: "",
     };
 
     //append to allChats (setAllChats), save, update current chat to new chat
@@ -79,7 +106,7 @@ export default function Home() {
       save(updatedChats);
       return updatedChats;
     });
-    //setChat(newChat);
+
     setSelectedChatId(newChat.id);
   };
 
@@ -118,7 +145,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex-1 min-h-0">
-          <MainSection selectedChat={chat!} />
+          <MainSection selectedChat={chat!} handleOnChange={setNote} />
         </div>
         <div className={styles.inputContainer}>
           <div>

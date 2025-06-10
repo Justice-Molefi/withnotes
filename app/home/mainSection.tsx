@@ -1,14 +1,30 @@
 "use client";
 
-import Notes from "../components/notes/Notes";
 import { useRef, useState, useEffect } from "react";
 import Chat from "../models/Chat";
 import ReactMarkdown from "react-markdown";
+import NotesEditor from "../components/notes/Editor";
 
-export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
+interface MainSectionProps {
+  selectedChat: Chat;
+  handleOnChange: (value: string) => void;
+}
+
+export default function MainSection({
+  selectedChat,
+  handleOnChange,
+}: MainSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [leftWidth, setLeftWidth] = useState(500);
   const isDragging = useRef(false);
+  const [chatId, setChatId] = useState<string>("");
+
+  // useEffect(() => {
+  //   if (selectedChat) {
+  //     setChatId(selectedChat.id);
+  //     console.log("Hail Marry: " + selectedChat.id);
+  //   }
+  // }, [selectedChat]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -42,7 +58,7 @@ export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
       ref={containerRef}
       className="font-[family-name:var(--font-geist-mono)] w-full h-full flex"
     >
-      {selectedChat.messages.length > 0 ? (
+      {selectedChat?.messages.length > 0 ? (
         <div
           style={{ width: leftWidth }}
           className="chat-container text-gray-300 flex flex-col px-14 overflow-y-auto w-full h-full"
@@ -76,7 +92,7 @@ export default function MainSection({ selectedChat }: { selectedChat: Chat }) {
         className="w-1 cursor-col-resize"
       />
       <div className="notes flex-1">
-        <Notes />
+        <NotesEditor selectedChatId={selectedChat?.id} />
       </div>
     </div>
   );

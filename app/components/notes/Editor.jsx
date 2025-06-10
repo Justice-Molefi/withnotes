@@ -16,6 +16,7 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
+import AutoSavePlugin from "./plugins/AutoSavePlugin";
 
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
@@ -48,7 +49,7 @@ const editorConfig = {
   ],
 };
 
-export default function NotesEditor() {
+export default function NotesEditor({selectedChatId}) {
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="h-full flex flex-col">
@@ -72,6 +73,7 @@ export default function NotesEditor() {
           <AutoLinkPlugin />
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+           <AutoSavePlugin selectedChatId={selectedChatId}/>
         </div>
       </div>
     </LexicalComposer>

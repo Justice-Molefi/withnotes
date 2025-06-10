@@ -1,10 +1,10 @@
-"use client";
-import NotesEditor from "./Editor";
+// "use client";
+// import NotesEditor from "./Editor";
 
-const Notes = () => {
-  return (
-    <NotesEditor/>
-  );
-};
+// const Notes = () => {
+//   return (
+//     <NotesEditor/>
+//   );
+// };
 
-export default Notes;
+// export default Notes;
