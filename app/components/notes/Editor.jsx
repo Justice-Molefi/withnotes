@@ -16,11 +16,11 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
-import AutoSavePlugin from "./plugins/AutoSavePlugin";
 
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
+import { SyncNotesPlugin } from "./plugins/SyncNotesPlugin";
 
 function Placeholder() {
   return <div className="editor-placeholder">Write Notes Here...</div>;
@@ -49,7 +49,7 @@ const editorConfig = {
   ],
 };
 
-export default function NotesEditor({selectedChatId}) {
+export default function NotesEditor({ selectedChatId, load }) {
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="h-full flex flex-col">
@@ -65,6 +65,7 @@ export default function NotesEditor({selectedChatId}) {
             placeholder={<Placeholder />}
             ErrorBoundary={LexicalErrorBoundary}
           />
+
           <HistoryPlugin />
           <AutoFocusPlugin />
           <CodeHighlightPlugin />
@@ -73,7 +74,7 @@ export default function NotesEditor({selectedChatId}) {
           <AutoLinkPlugin />
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-           <AutoSavePlugin selectedChatId={selectedChatId}/>
+          <SyncNotesPlugin load={load} selectedChatId={selectedChatId} />
         </div>
       </div>
     </LexicalComposer>

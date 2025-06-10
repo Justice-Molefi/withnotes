@@ -8,7 +8,6 @@ import Chat from "./models/Chat";
 import styles from "./page.module.css";
 import { Role } from "./models/Role";
 import sendPrompt from "./home/actions";
-import { Coins } from "lucide-react";
 
 export default function Home() {
   const [selectedChatId, setSelectedChatId] = useState<string>("");
@@ -17,7 +16,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState<string>("");
   const [disableSend, setDisableSend] = useState<boolean>(false);
   const [note, setNote] = useState("");
-  const [debouncedNote, setDebouncedNote] = useState(note);
+  const [load,setLoad] = useState<boolean>(true);
 
   //load all chats
   useEffect(() => {
@@ -34,29 +33,30 @@ export default function Home() {
   //when click item, have to update current chat
   useEffect(() => {
     setChat(allChats.find((chat) => chat.id === selectedChatId));
+    setLoad(true);
   }, [selectedChatId]);
 
   //save note
-  useEffect(() => {
-    console.log("Saving Note : " + note);
-    const timeout = setTimeout(() => {
-      if (chat) {
-        const updatedChat = {
-          ...chat,
-          note: note,
-        };
+  // useEffect(() => {
+  //   console.log("Saving Note : " + note);
+  //   const timeout = setTimeout(() => {
+  //     if (chat) {
+  //       const updatedChat = {
+  //         ...chat,
+  //         note: note,
+  //       };
 
-        setAllChats((prev) => {
-          const updatedChats = prev.map((chat) =>
-            chat.id === updatedChat.id ? updatedChat : chat
-          );
-          save(updatedChats);
-          return updatedChats;
-        });
-      }
-    }, 1000);
-    return () => clearTimeout(timeout);
-  }, [note]);
+  //       setAllChats((prev) => {
+  //         const updatedChats = prev.map((chat) =>
+  //           chat.id === updatedChat.id ? updatedChat : chat
+  //         );
+  //         save(updatedChats);
+  //         return updatedChats;
+  //       });
+  //     }
+  //   }, 1000);
+  //   return () => clearTimeout(timeout);
+  // }, [note]);
 
   const handleSendPrompt = async () => {
     if (chat) {
@@ -145,7 +145,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex-1 min-h-0">
-          <MainSection selectedChat={chat!} handleOnChange={setNote} />
+          <MainSection load={load} selectedChat={chat!} handleOnChange={setNote} />
         </div>
         <div className={styles.inputContainer}>
           <div>

@@ -7,24 +7,18 @@ import NotesEditor from "../components/notes/Editor";
 
 interface MainSectionProps {
   selectedChat: Chat;
+  load: boolean;
   handleOnChange: (value: string) => void;
 }
 
 export default function MainSection({
   selectedChat,
+  load,
   handleOnChange,
 }: MainSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [leftWidth, setLeftWidth] = useState(500);
   const isDragging = useRef(false);
-  const [chatId, setChatId] = useState<string>("");
-
-  // useEffect(() => {
-  //   if (selectedChat) {
-  //     setChatId(selectedChat.id);
-  //     console.log("Hail Marry: " + selectedChat.id);
-  //   }
-  // }, [selectedChat]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -92,7 +86,7 @@ export default function MainSection({
         className="w-1 cursor-col-resize"
       />
       <div className="notes flex-1">
-        <NotesEditor selectedChatId={selectedChat?.id} />
+        <NotesEditor load={load} selectedChatId={selectedChat?.id} />
       </div>
     </div>
   );
