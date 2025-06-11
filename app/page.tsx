@@ -8,6 +8,7 @@ import Chat from "./models/Chat";
 import styles from "./page.module.css";
 import { Role } from "./models/Role";
 import sendPrompt from "./home/actions";
+import { Note } from "./models/Note";
 
 export default function Home() {
   const [selectedChatId, setSelectedChatId] = useState<string>("");
@@ -15,8 +16,7 @@ export default function Home() {
   const [allChats, setAllChats] = useState<Chat[]>([]);
   const [prompt, setPrompt] = useState<string>("");
   const [disableSend, setDisableSend] = useState<boolean>(false);
-  const [note, setNote] = useState("");
-  const [load,setLoad] = useState<boolean>(true);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   //load all chats
   useEffect(() => {
@@ -33,30 +33,7 @@ export default function Home() {
   //when click item, have to update current chat
   useEffect(() => {
     setChat(allChats.find((chat) => chat.id === selectedChatId));
-    setLoad(true);
   }, [selectedChatId]);
-
-  //save note
-  // useEffect(() => {
-  //   console.log("Saving Note : " + note);
-  //   const timeout = setTimeout(() => {
-  //     if (chat) {
-  //       const updatedChat = {
-  //         ...chat,
-  //         note: note,
-  //       };
-
-  //       setAllChats((prev) => {
-  //         const updatedChats = prev.map((chat) =>
-  //           chat.id === updatedChat.id ? updatedChat : chat
-  //         );
-  //         save(updatedChats);
-  //         return updatedChats;
-  //       });
-  //     }
-  //   }, 1000);
-  //   return () => clearTimeout(timeout);
-  // }, [note]);
 
   const handleSendPrompt = async () => {
     if (chat) {
@@ -112,8 +89,18 @@ export default function Home() {
 
   const handleDeleteChat = (id: string) => {
     const updatedChats = allChats.filter((chat) => chat.id !== id);
+    const notes = localStorage.getItem("Notes");
+
+    if(notes){
+      const parsedNotes : Note[] = JSON.parse(notes);
+      if(parsedNotes.length > 0){
+        const updatedNotes = parsedNotes.filter(note => note.id !== id);
+        localStorage.setItem("Notes",JSON.stringify(updatedNotes))
+      }
+    }
     save(updatedChats);
     setAllChats(updatedChats);
+    setSelectedChatId(updatedChats[0].id);
   };
 
   //helper functions
@@ -135,6 +122,7 @@ export default function Home() {
         handleMenuItemClick={setSelectedChatId}
         handleNewChat={handleCreateNewChat}
         chats={allChats}
+        isSaving={isSaving}
         handleDeleteChat={handleDeleteChat}
       />
       <main className="w-full h-screen flex flex-col">
@@ -145,7 +133,7 @@ export default function Home() {
           </div>
         </div>
         <div className="flex-1 min-h-0">
-          <MainSection load={load} selectedChat={chat!} handleOnChange={setNote} />
+          <MainSection handleIsSaving={setIsSaving} selectedChat={chat!} />
         </div>
         <div className={styles.inputContainer}>
           <div>

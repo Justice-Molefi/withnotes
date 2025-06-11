@@ -7,14 +7,12 @@ import NotesEditor from "../components/notes/Editor";
 
 interface MainSectionProps {
   selectedChat: Chat;
-  load: boolean;
-  handleOnChange: (value: string) => void;
+  handleIsSaving: (isSaving : boolean) => void;
 }
 
 export default function MainSection({
   selectedChat,
-  load,
-  handleOnChange,
+  handleIsSaving,
 }: MainSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [leftWidth, setLeftWidth] = useState(500);
@@ -86,7 +84,7 @@ export default function MainSection({
         className="w-1 cursor-col-resize"
       />
       <div className="notes flex-1">
-        <NotesEditor load={load} selectedChatId={selectedChat?.id} />
+        <NotesEditor handleIsSaving={handleIsSaving} selectedChatId={selectedChat?.id} />
       </div>
     </div>
   );

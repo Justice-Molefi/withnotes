@@ -49,7 +49,7 @@ const editorConfig = {
   ],
 };
 
-export default function NotesEditor({ selectedChatId, load }) {
+export default function NotesEditor({ selectedChatId, handleIsSaving }) {
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="h-full flex flex-col">
@@ -74,7 +74,7 @@ export default function NotesEditor({ selectedChatId, load }) {
           <AutoLinkPlugin />
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-          <SyncNotesPlugin load={load} selectedChatId={selectedChatId} />
+          <SyncNotesPlugin handleIsSaving={handleIsSaving} selectedChatId={selectedChatId} />
         </div>
       </div>
     </LexicalComposer>

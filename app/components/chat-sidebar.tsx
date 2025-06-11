@@ -19,11 +19,12 @@ import Chat from "../models/Chat";
 interface SideBarProps {
   handleMenuItemClick : (chatId: string) => void,
   handleNewChat: () => void,
+  isSaving : boolean,
   handleDeleteChat: (id : string) => void,
   chats : Chat[]
 }
 
-export function ChatSideBar({handleMenuItemClick,handleNewChat,handleDeleteChat, chats}: SideBarProps) {
+export function ChatSideBar({handleMenuItemClick, isSaving, handleNewChat,handleDeleteChat, chats}: SideBarProps) {
   return (
     <Sidebar>
       <SidebarHeader>
@@ -45,7 +46,7 @@ export function ChatSideBar({handleMenuItemClick,handleNewChat,handleDeleteChat,
                 <SidebarMenuItem key={index}>
                   <SidebarMenuButton
                     className="cursor-pointer flex-1 overflow-hidden"
-                    onClick={() => handleMenuItemClick(chat.id)}
+                    onClick={() => { !isSaving ? handleMenuItemClick(chat.id) : console.log("Saving Please Wait.") }}
                   >
                     <a className="block overflow-hidden">
                       <span className="truncate block max-w-full text-xs">{chat.summary ? chat.summary : 'new chat'}</span>

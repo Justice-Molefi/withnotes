@@ -6,9 +6,9 @@ import { Note } from "@/app/models/Note";
 
 interface SyncProps {
   selectedChatId: string;
-  load: boolean;
+  handleIsSaving: (isSaving: boolean) => void;
 }
-export function SyncNotesPlugin({ selectedChatId, load }: SyncProps) {
+export function SyncNotesPlugin({ selectedChatId, handleIsSaving }: SyncProps) {
   const [editor] = useLexicalComposerContext();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [noteContent, setNoteContent] = useState<string>();
@@ -29,7 +29,7 @@ export function SyncNotesPlugin({ selectedChatId, load }: SyncProps) {
         editor.update(() => {
           $convertFromMarkdownString(currentChatNotes.content, TRANSFORMERS);
         });
-      }else{
+      } else {
         SaveNote();
       }
     }
@@ -46,9 +46,8 @@ export function SyncNotesPlugin({ selectedChatId, load }: SyncProps) {
         editorState.read(() => {
           const content = $convertToMarkdownString(TRANSFORMERS);
           setNoteContent(content);
-          console.log("Auto-saved at::", new Date().toLocaleTimeString());
         });
-      }, 2000);
+      }, 100);
     });
   }, [editor]);
 
@@ -59,12 +58,13 @@ export function SyncNotesPlugin({ selectedChatId, load }: SyncProps) {
   //helper methods
   const SaveNote = () => {
     let allNotes = loadNotes();
-
     if (allNotes) {
+      handleIsSaving(true);
       const newNote = allNotes.find((note) => note.id === selectedChatId);
       if (newNote) {
         newNote.content = noteContent!;
         localStorage.setItem("Notes", JSON.stringify(allNotes));
+        handleIsSaving(false);
         return;
       }
 
@@ -75,6 +75,8 @@ export function SyncNotesPlugin({ selectedChatId, load }: SyncProps) {
 
       allNotes.push(Note);
       localStorage.setItem("Notes", JSON.stringify(allNotes));
+      console.log("Auto-saved at::", new Date().toLocaleTimeString());
+      handleIsSaving(false);
       return;
     }
   };
@@ -94,7 +96,6 @@ export function SyncNotesPlugin({ selectedChatId, load }: SyncProps) {
   const resetEditor = () => {
     editor.update(() => {
       $convertFromMarkdownString("", TRANSFORMERS);
-      console.log("RESET!!!");
     });
   };
 
