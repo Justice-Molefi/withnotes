@@ -1,9 +1,9 @@
 "use server";
 
 import OpenAI from "openai";
-import Message from "../models/Message";
 import Chat from "../models/Chat";
 import { Role } from "../models/Role";
+import Message from "../models/Message";
 
 const openai = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -17,7 +17,7 @@ export default async function sendPrompt(
   if (!chat) return null;
 
   //is this new chat??
-  var isNewChat = !chat.summary;
+  let isNewChat = !chat.summary;
   let summary = "";
 
   if (isNewChat) {
@@ -59,9 +59,9 @@ ${userPrompt}`;
 }
 
 //make request to model api
-async function send(messages: any) {
+async function send(messages: Message[]) {
   const response = await openai.chat.completions.create({
-    messages: messages,
+    messages: messages as any,
     model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
   });
 

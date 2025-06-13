@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import { $convertToMarkdownString, TRANSFORMERS } from "@lexical/markdown";
@@ -57,7 +57,7 @@ export function SyncNotesPlugin({ selectedChatId, handleIsSaving }: SyncProps) {
 
   //helper methods
   const SaveNote = () => {
-    let allNotes = loadNotes();
+    const allNotes = loadNotes();
     if (allNotes) {
       handleIsSaving(true);
       const newNote = allNotes.find((note) => note.id === selectedChatId);

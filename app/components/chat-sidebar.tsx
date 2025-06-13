@@ -13,7 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Delete, PlusIcon, Trash } from "lucide-react";
+import { PlusIcon, Trash } from "lucide-react";
 import Chat from "../models/Chat";
 
 interface SideBarProps {
@@ -25,12 +25,18 @@ interface SideBarProps {
 }
 
 export function ChatSideBar({handleMenuItemClick, isSaving, handleNewChat,handleDeleteChat, chats}: SideBarProps) {
+  const handleMenuItemClickWrapper = (id : string) => {
+    if(!isSaving){
+      handleMenuItemClick(id);
+      return;
+    }
+  }
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="name ml-1">Withnotes</div>
         <button
-          className="mt-2 flex items-center gap-2 px-3 py-1 text-sm text-white cursor-pointer"
+          className="mt-2 flex items-center gap-2 px-3 py-1 text-sm textite cursor-pointer"
           onClick={() => handleNewChat()}
         >
           <PlusIcon className="h-4 w-4" />
@@ -46,7 +52,7 @@ export function ChatSideBar({handleMenuItemClick, isSaving, handleNewChat,handle
                 <SidebarMenuItem key={index}>
                   <SidebarMenuButton
                     className="cursor-pointer flex-1 overflow-hidden"
-                    onClick={() => { !isSaving ? handleMenuItemClick(chat.id) : console.log("Saving Please Wait.") }}
+                    onClick={() => handleMenuItemClickWrapper(chat.id)}
                   >
                     <a className="block overflow-hidden">
                       <span className="truncate block max-w-full text-xs">{chat.summary ? chat.summary : 'new chat'}</span>
