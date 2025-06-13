@@ -17,7 +17,7 @@ export default async function sendPrompt(
   if (!chat) return null;
 
   //is this new chat??
-  let isNewChat = !chat.summary;
+  const isNewChat = !chat.summary;
   let summary = "";
 
   if (isNewChat) {
@@ -61,6 +61,7 @@ ${userPrompt}`;
 //make request to model api
 async function send(messages: Message[]) {
   const response = await openai.chat.completions.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     messages: messages as any,
     model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
   });
